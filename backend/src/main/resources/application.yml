@@ -1,0 +1,50 @@
+server:
+  port: ${BACKEND_PORT:8080}
+
+spring:
+  application:
+    name: jobpilot-ai
+  profiles:
+    active: ${SPRING_PROFILES_ACTIVE:dev}
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://${DB_HOST:localhost}:${DB_PORT:3306}/${DB_NAME:jobpilot_ai}?useUnicode=true&characterEncoding=utf8&serverTimezone=Asia/Shanghai&allowPublicKeyRetrieval=true&useSSL=false
+    username: ${DB_USERNAME:jobpilot}
+    password: ${DB_PASSWORD:jobpilot_password}
+  data:
+    redis:
+      host: ${REDIS_HOST:localhost}
+      port: ${REDIS_PORT:6379}
+      timeout: 3s
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+
+mybatis-plus:
+  configuration:
+    map-underscore-to-camel-case: true
+  global-config:
+    db-config:
+      id-type: auto
+
+jobpilot:
+  jwt:
+    secret: ${JWT_SECRET:replace-with-at-least-32-characters-secret}
+    expiration-minutes: ${JWT_EXPIRATION_MINUTES:1440}
+  ai:
+    provider: ${AI_PROVIDER:mock}
+    model: ${AI_MODEL:mock-chat}
+    api-key: ${AI_API_KEY:}
+    base-url: ${AI_BASE_URL:}
+  embedding:
+    provider: ${EMBEDDING_PROVIDER:mock}
+    model: ${EMBEDDING_MODEL:mock-embedding}
+    dimension: ${EMBEDDING_DIMENSION:1536}
+  qdrant:
+    host: ${QDRANT_HOST:http://localhost:6333}
+    collection: ${QDRANT_COLLECTION:jobpilot_questions}
+
+logging:
+  level:
+    com.jobpilot: INFO

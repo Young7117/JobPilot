@@ -1,0 +1,1665 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>JobPilot AI Preview</title>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <style>
+      :root {
+        --bg-page: #f6f8fb;
+        --bg-surface: #ffffff;
+        --bg-soft: #f1f5f9;
+        --bg-blue: #eff6ff;
+        --bg-green: #ecfdf5;
+        --bg-amber: #fffbeb;
+        --bg-red: #fef2f2;
+        --text-primary: #0f172a;
+        --text-secondary: #475569;
+        --text-muted: #64748b;
+        --border: #e2e8f0;
+        --border-strong: #cbd5e1;
+        --primary: #1677ff;
+        --primary-dark: #0958d9;
+        --success: #16a34a;
+        --warning: #d97706;
+        --danger: #dc2626;
+        --info: #0891b2;
+        --radius-sm: 4px;
+        --radius-md: 6px;
+        --radius-lg: 8px;
+        --shadow: 0 14px 32px rgba(15, 23, 42, 0.08);
+      }
+
+      * {
+        box-sizing: border-box;
+      }
+
+      body {
+        margin: 0;
+        min-height: 100vh;
+        background: var(--bg-page);
+        color: var(--text-primary);
+        font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        font-size: 14px;
+        letter-spacing: 0;
+      }
+
+      button,
+      input,
+      select,
+      textarea {
+        font: inherit;
+      }
+
+      button {
+        cursor: pointer;
+      }
+
+      .app-shell {
+        display: grid;
+        grid-template-columns: 236px minmax(0, 1fr);
+        min-height: 100vh;
+      }
+
+      .sidebar {
+        position: sticky;
+        top: 0;
+        height: 100vh;
+        display: flex;
+        flex-direction: column;
+        gap: 18px;
+        padding: 18px 14px;
+        border-right: 1px solid var(--border);
+        background: #0f172a;
+        color: #e2e8f0;
+      }
+
+      .brand {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 6px 8px 12px;
+      }
+
+      .brand-mark {
+        display: grid;
+        place-items: center;
+        width: 34px;
+        height: 34px;
+        border-radius: var(--radius-lg);
+        background: #1677ff;
+        color: #fff;
+        font-weight: 700;
+      }
+
+      .brand-name {
+        display: flex;
+        flex-direction: column;
+        gap: 2px;
+      }
+
+      .brand-name strong {
+        font-size: 16px;
+        line-height: 22px;
+      }
+
+      .brand-name span {
+        color: #94a3b8;
+        font-size: 12px;
+      }
+
+      .nav {
+        display: grid;
+        gap: 4px;
+      }
+
+      .nav-button {
+        width: 100%;
+        min-height: 40px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        padding: 9px 10px;
+        border: 0;
+        border-radius: var(--radius-md);
+        background: transparent;
+        color: #cbd5e1;
+        text-align: left;
+      }
+
+      .nav-button:hover,
+      .nav-button.active {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+      }
+
+      .nav-button svg,
+      .icon-button svg,
+      .btn svg,
+      .small-action svg {
+        width: 16px;
+        height: 16px;
+        flex: none;
+      }
+
+      .sidebar-footer {
+        margin-top: auto;
+        padding: 12px;
+        border: 1px solid rgba(148, 163, 184, 0.25);
+        border-radius: var(--radius-lg);
+        background: rgba(15, 23, 42, 0.35);
+      }
+
+      .sidebar-footer strong {
+        display: block;
+        color: #fff;
+        font-size: 13px;
+        line-height: 20px;
+      }
+
+      .sidebar-footer span {
+        color: #94a3b8;
+        font-size: 12px;
+        line-height: 18px;
+      }
+
+      .main {
+        min-width: 0;
+      }
+
+      .topbar {
+        position: sticky;
+        top: 0;
+        z-index: 10;
+        height: 62px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 16px;
+        padding: 0 24px;
+        border-bottom: 1px solid var(--border);
+        background: rgba(246, 248, 251, 0.92);
+        backdrop-filter: blur(12px);
+      }
+
+      .context {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        min-width: 0;
+      }
+
+      .context-item {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        min-width: 0;
+        max-width: 280px;
+        padding: 6px 10px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: var(--bg-surface);
+        color: var(--text-secondary);
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .top-actions {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+      }
+
+      .icon-button {
+        width: 36px;
+        height: 36px;
+        display: grid;
+        place-items: center;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        background: var(--bg-surface);
+        color: var(--text-secondary);
+      }
+
+      .content {
+        width: min(100%, 1480px);
+        margin: 0 auto;
+        padding: 24px;
+      }
+
+      .view {
+        display: none;
+      }
+
+      .view.active {
+        display: block;
+      }
+
+      .page-header {
+        display: flex;
+        align-items: flex-start;
+        justify-content: space-between;
+        gap: 16px;
+        margin-bottom: 18px;
+      }
+
+      .page-title {
+        margin: 0;
+        font-size: 24px;
+        line-height: 32px;
+        font-weight: 650;
+      }
+
+      .page-subtitle {
+        margin: 4px 0 0;
+        color: var(--text-secondary);
+        line-height: 22px;
+      }
+
+      .btn {
+        min-height: 36px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        gap: 7px;
+        padding: 7px 12px;
+        border: 1px solid var(--border-strong);
+        border-radius: var(--radius-md);
+        background: var(--bg-surface);
+        color: var(--text-primary);
+        text-decoration: none;
+        white-space: nowrap;
+      }
+
+      .btn.primary {
+        border-color: var(--primary);
+        background: var(--primary);
+        color: #fff;
+      }
+
+      .btn.primary:hover {
+        background: var(--primary-dark);
+      }
+
+      .btn.ghost {
+        border-color: transparent;
+        background: transparent;
+        color: var(--text-secondary);
+      }
+
+      .btn.danger {
+        border-color: #fecaca;
+        color: var(--danger);
+      }
+
+      .grid {
+        display: grid;
+        gap: 16px;
+      }
+
+      .grid.cols-2 {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+
+      .grid.cols-3 {
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+      }
+
+      .grid.cols-4 {
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+      }
+
+      .split {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 360px;
+        gap: 16px;
+        align-items: start;
+      }
+
+      .panel {
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        background: var(--bg-surface);
+      }
+
+      .panel-header {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        gap: 12px;
+        padding: 16px 18px;
+        border-bottom: 1px solid var(--border);
+      }
+
+      .panel-title {
+        margin: 0;
+        font-size: 16px;
+        line-height: 24px;
+        font-weight: 650;
+      }
+
+      .panel-body {
+        padding: 18px;
+      }
+
+      .stat-grid {
+        display: grid;
+        grid-template-columns: repeat(6, minmax(0, 1fr));
+        gap: 12px;
+        margin-bottom: 16px;
+      }
+
+      .stat-card {
+        min-height: 104px;
+        padding: 16px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        background: var(--bg-surface);
+      }
+
+      .stat-card span {
+        color: var(--text-muted);
+        font-size: 12px;
+      }
+
+      .stat-card strong {
+        display: block;
+        margin-top: 8px;
+        font-size: 28px;
+        line-height: 36px;
+        font-weight: 650;
+      }
+
+      .stat-card small {
+        display: block;
+        margin-top: 4px;
+        color: var(--text-secondary);
+        font-size: 12px;
+      }
+
+      .hero-strip {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        gap: 16px;
+        align-items: center;
+        margin-bottom: 16px;
+        padding: 20px;
+        border: 1px solid #bfdbfe;
+        border-radius: var(--radius-lg);
+        background: linear-gradient(135deg, #ffffff 0%, #eff6ff 64%, #ecfeff 100%);
+      }
+
+      .hero-strip h2 {
+        margin: 0;
+        font-size: 20px;
+        line-height: 28px;
+      }
+
+      .hero-strip p {
+        max-width: 760px;
+        margin: 6px 0 0;
+        color: var(--text-secondary);
+        line-height: 22px;
+      }
+
+      .timeline {
+        display: grid;
+        gap: 12px;
+      }
+
+      .timeline-item {
+        display: grid;
+        grid-template-columns: 28px minmax(0, 1fr);
+        gap: 10px;
+      }
+
+      .timeline-dot {
+        width: 28px;
+        height: 28px;
+        display: grid;
+        place-items: center;
+        border-radius: 999px;
+        background: var(--bg-blue);
+        color: var(--primary);
+      }
+
+      .timeline-item h4 {
+        margin: 0;
+        font-size: 14px;
+        line-height: 22px;
+      }
+
+      .timeline-item p {
+        margin: 2px 0 0;
+        color: var(--text-secondary);
+        font-size: 13px;
+        line-height: 20px;
+      }
+
+      .tag-row {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+      }
+
+      .tag {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        min-height: 24px;
+        padding: 2px 8px;
+        border: 1px solid var(--border);
+        border-radius: 999px;
+        background: var(--bg-soft);
+        color: var(--text-secondary);
+        font-size: 12px;
+        line-height: 18px;
+      }
+
+      .tag.blue {
+        border-color: #bfdbfe;
+        background: var(--bg-blue);
+        color: #1d4ed8;
+      }
+
+      .tag.green {
+        border-color: #bbf7d0;
+        background: var(--bg-green);
+        color: #15803d;
+      }
+
+      .tag.amber {
+        border-color: #fde68a;
+        background: var(--bg-amber);
+        color: #a16207;
+      }
+
+      .tag.red {
+        border-color: #fecaca;
+        background: var(--bg-red);
+        color: #b91c1c;
+      }
+
+      .table-wrap {
+        overflow: auto;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        background: var(--bg-surface);
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        min-width: 760px;
+      }
+
+      th,
+      td {
+        padding: 12px 14px;
+        border-bottom: 1px solid var(--border);
+        text-align: left;
+        vertical-align: top;
+      }
+
+      th {
+        background: #f8fafc;
+        color: var(--text-secondary);
+        font-size: 12px;
+        font-weight: 600;
+      }
+
+      tr:last-child td {
+        border-bottom: 0;
+      }
+
+      td strong {
+        display: block;
+        margin-bottom: 3px;
+      }
+
+      td small {
+        color: var(--text-muted);
+        line-height: 18px;
+      }
+
+      .filter-bar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
+        align-items: center;
+        margin-bottom: 14px;
+        padding: 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        background: var(--bg-surface);
+      }
+
+      .field,
+      .select,
+      .textarea {
+        border: 1px solid var(--border-strong);
+        border-radius: var(--radius-md);
+        background: #fff;
+        color: var(--text-primary);
+      }
+
+      .field,
+      .select {
+        min-height: 36px;
+        padding: 7px 10px;
+      }
+
+      .textarea {
+        width: 100%;
+        min-height: 148px;
+        resize: vertical;
+        padding: 12px;
+        line-height: 22px;
+      }
+
+      .upload-grid {
+        display: grid;
+        grid-template-columns: repeat(3, minmax(0, 1fr));
+        gap: 12px;
+      }
+
+      .upload-tile {
+        min-height: 128px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        justify-content: center;
+        gap: 8px;
+        padding: 18px;
+        border: 1px dashed var(--border-strong);
+        border-radius: var(--radius-lg);
+        background: #fbfdff;
+      }
+
+      .upload-tile svg {
+        width: 22px;
+        height: 22px;
+        color: var(--primary);
+      }
+
+      .upload-tile strong {
+        font-size: 15px;
+      }
+
+      .upload-tile span {
+        color: var(--text-secondary);
+        font-size: 12px;
+        line-height: 18px;
+      }
+
+      .score-wrap {
+        display: grid;
+        grid-template-columns: 148px minmax(0, 1fr);
+        gap: 18px;
+        align-items: center;
+      }
+
+      .score-ring {
+        width: 132px;
+        height: 132px;
+        display: grid;
+        place-items: center;
+        border-radius: 999px;
+        background: conic-gradient(var(--primary) 0 78%, #e2e8f0 78% 100%);
+      }
+
+      .score-ring-inner {
+        width: 100px;
+        height: 100px;
+        display: grid;
+        place-items: center;
+        border-radius: 999px;
+        background: #fff;
+      }
+
+      .score-ring strong {
+        font-size: 30px;
+        line-height: 34px;
+      }
+
+      .score-ring span {
+        color: var(--text-muted);
+        font-size: 12px;
+      }
+
+      .capability-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .capability {
+        display: grid;
+        grid-template-columns: 150px minmax(0, 1fr) auto;
+        gap: 12px;
+        align-items: center;
+        padding: 10px 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        background: #fff;
+      }
+
+      .bar {
+        height: 8px;
+        overflow: hidden;
+        border-radius: 999px;
+        background: #e2e8f0;
+      }
+
+      .bar > span {
+        display: block;
+        height: 100%;
+        border-radius: inherit;
+        background: var(--primary);
+      }
+
+      .bar.green > span {
+        background: var(--success);
+      }
+
+      .bar.amber > span {
+        background: var(--warning);
+      }
+
+      .bar.red > span {
+        background: var(--danger);
+      }
+
+      .insight-list {
+        display: grid;
+        gap: 10px;
+      }
+
+      .insight {
+        padding: 12px;
+        border-radius: var(--radius-md);
+        border: 1px solid var(--border);
+        background: #fff;
+      }
+
+      .insight h4 {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin: 0 0 6px;
+        font-size: 14px;
+      }
+
+      .insight p {
+        margin: 0;
+        color: var(--text-secondary);
+        line-height: 21px;
+      }
+
+      .question-card {
+        display: grid;
+        gap: 10px;
+        padding: 14px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-lg);
+        background: var(--bg-surface);
+      }
+
+      .question-card h3 {
+        margin: 0;
+        font-size: 16px;
+        line-height: 24px;
+      }
+
+      .question-meta {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+        align-items: center;
+      }
+
+      .ai-stepper {
+        display: grid;
+        grid-template-columns: repeat(4, minmax(0, 1fr));
+        gap: 10px;
+      }
+
+      .ai-step {
+        padding: 12px;
+        border: 1px solid var(--border);
+        border-radius: var(--radius-md);
+        background: #fff;
+      }
+
+      .ai-step.active {
+        border-color: #bfdbfe;
+        background: var(--bg-blue);
+      }
+
+      .ai-step.done {
+        border-color: #bbf7d0;
+        background: var(--bg-green);
+      }
+
+      .ai-step strong {
+        display: block;
+        margin-bottom: 4px;
+      }
+
+      .ai-step span {
+        color: var(--text-secondary);
+        font-size: 12px;
+      }
+
+      .practice-grid {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) 380px;
+        gap: 16px;
+      }
+
+      .evaluation {
+        display: grid;
+        grid-template-columns: 96px minmax(0, 1fr);
+        gap: 16px;
+        align-items: start;
+        padding: 16px;
+        border: 1px solid #bfdbfe;
+        border-radius: var(--radius-lg);
+        background: #f8fbff;
+      }
+
+      .grade {
+        display: grid;
+        place-items: center;
+        width: 82px;
+        height: 82px;
+        border-radius: var(--radius-lg);
+        background: var(--primary);
+        color: #fff;
+      }
+
+      .grade strong {
+        font-size: 28px;
+      }
+
+      .knowledge-layout {
+        display: grid;
+        grid-template-columns: 220px minmax(0, 1fr) 360px;
+        gap: 16px;
+      }
+
+      .category-list {
+        display: grid;
+        gap: 6px;
+      }
+
+      .category-button {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        min-height: 36px;
+        padding: 8px 10px;
+        border: 1px solid transparent;
+        border-radius: var(--radius-md);
+        background: transparent;
+        color: var(--text-secondary);
+        text-align: left;
+      }
+
+      .category-button.active {
+        border-color: #bfdbfe;
+        background: var(--bg-blue);
+        color: #1d4ed8;
+      }
+
+      .progress-row {
+        display: grid;
+        gap: 8px;
+      }
+
+      .progress-line {
+        display: grid;
+        grid-template-columns: 88px minmax(0, 1fr) 42px;
+        gap: 10px;
+        align-items: center;
+        color: var(--text-secondary);
+        font-size: 13px;
+      }
+
+      .toast {
+        position: fixed;
+        right: 24px;
+        bottom: 24px;
+        z-index: 100;
+        display: none;
+        align-items: center;
+        gap: 8px;
+        max-width: min(420px, calc(100vw - 48px));
+        padding: 12px 14px;
+        border: 1px solid #bfdbfe;
+        border-radius: var(--radius-lg);
+        background: #fff;
+        box-shadow: var(--shadow);
+        color: var(--text-primary);
+      }
+
+      .toast.show {
+        display: flex;
+      }
+
+      .mobile-menu {
+        display: none;
+      }
+
+      @media (max-width: 1180px) {
+        .stat-grid,
+        .grid.cols-4 {
+          grid-template-columns: repeat(3, minmax(0, 1fr));
+        }
+
+        .split,
+        .practice-grid,
+        .knowledge-layout {
+          grid-template-columns: 1fr;
+        }
+      }
+
+      @media (max-width: 860px) {
+        .app-shell {
+          grid-template-columns: 1fr;
+        }
+
+        .sidebar {
+          position: fixed;
+          inset: 0 auto 0 0;
+          z-index: 30;
+          width: min(290px, 86vw);
+          transform: translateX(-100%);
+          transition: transform 0.2s ease;
+        }
+
+        .sidebar.open {
+          transform: translateX(0);
+        }
+
+        .mobile-menu {
+          display: grid;
+        }
+
+        .topbar {
+          padding: 0 14px;
+        }
+
+        .context {
+          display: none;
+        }
+
+        .content {
+          padding: 16px;
+        }
+
+        .page-header,
+        .hero-strip {
+          grid-template-columns: 1fr;
+          flex-direction: column;
+        }
+
+        .stat-grid,
+        .grid.cols-2,
+        .grid.cols-3,
+        .grid.cols-4,
+        .upload-grid,
+        .ai-stepper {
+          grid-template-columns: 1fr;
+        }
+
+        .score-wrap,
+        .evaluation {
+          grid-template-columns: 1fr;
+        }
+
+        .capability {
+          grid-template-columns: 1fr;
+        }
+
+        .top-actions .btn:not(.primary) {
+          display: none;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="app-shell">
+      <aside class="sidebar" id="sidebar">
+        <div class="brand">
+          <div class="brand-mark">JP</div>
+          <div class="brand-name">
+            <strong>JobPilot AI</strong>
+            <span>岗位作战台</span>
+          </div>
+        </div>
+
+        <nav class="nav" aria-label="主导航">
+          <button class="nav-button active" data-view="dashboard" title="Dashboard">
+            <i data-lucide="layout-dashboard"></i><span>Dashboard</span>
+          </button>
+          <button class="nav-button" data-view="resumes" title="简历">
+            <i data-lucide="file-text"></i><span>简历</span>
+          </button>
+          <button class="nav-button" data-view="jobs" title="岗位">
+            <i data-lucide="briefcase-business"></i><span>岗位</span>
+          </button>
+          <button class="nav-button" data-view="battle" title="作战卡">
+            <i data-lucide="target"></i><span>作战卡</span>
+          </button>
+          <button class="nav-button" data-view="questions" title="题库练习">
+            <i data-lucide="messages-square"></i><span>题库练习</span>
+          </button>
+          <button class="nav-button" data-view="knowledge" title="知识库">
+            <i data-lucide="book-open"></i><span>知识库</span>
+          </button>
+          <button class="nav-button" data-view="applications" title="投递复盘">
+            <i data-lucide="send"></i><span>投递复盘</span>
+          </button>
+          <button class="nav-button" data-view="settings" title="设置">
+            <i data-lucide="settings"></i><span>设置</span>
+          </button>
+        </nav>
+
+        <div class="sidebar-footer">
+          <strong>当前阶段</strong>
+          <span>MVP 先聚焦计算机领域，保留多行业扩展能力。</span>
+        </div>
+      </aside>
+
+      <main class="main">
+        <header class="topbar">
+          <button class="icon-button mobile-menu" id="menuButton" title="打开导航" aria-label="打开导航">
+            <i data-lucide="menu"></i>
+          </button>
+          <div class="context">
+            <span class="context-item"><i data-lucide="file-check-2"></i>默认简历：Java 后端实习版</span>
+            <span class="context-item"><i data-lucide="briefcase"></i>活跃岗位：后端开发工程师</span>
+            <span class="context-item"><i data-lucide="map-pin"></i>上海 · 12-18K</span>
+          </div>
+          <div class="top-actions">
+            <button class="btn" data-view-jump="resumes"><i data-lucide="upload"></i>上传简历</button>
+            <button class="btn" data-view-jump="jobs"><i data-lucide="plus"></i>新建岗位</button>
+            <button class="btn primary" data-action="generate-card"><i data-lucide="sparkles"></i>生成作战卡</button>
+            <button class="icon-button" title="通知" aria-label="通知"><i data-lucide="bell"></i></button>
+          </div>
+        </header>
+
+        <div class="content">
+          <section class="view active" id="dashboard">
+            <div class="page-header">
+              <div>
+                <h1 class="page-title">Dashboard</h1>
+                <p class="page-subtitle">围绕目标岗位推进简历、作战卡、题目练习和投递复盘。</p>
+              </div>
+              <button class="btn primary" data-view-jump="jobs"><i data-lucide="plus"></i>准备一个新岗位</button>
+            </div>
+
+            <div class="hero-strip">
+              <div>
+                <h2>下一步：补齐 Redis 与 Docker 部署短板</h2>
+                <p>当前岗位匹配分 78，公共题库已召回 18 道题，建议先完成 6 道高频项目追问题，再进入投递复盘。</p>
+              </div>
+              <button class="btn primary" data-view-jump="questions"><i data-lucide="play"></i>开始练习</button>
+            </div>
+
+            <div class="stat-grid">
+              <div class="stat-card"><span>简历版本</span><strong>3</strong><small>1 份默认简历</small></div>
+              <div class="stat-card"><span>目标岗位</span><strong>8</strong><small>3 个准备中</small></div>
+              <div class="stat-card"><span>作战卡</span><strong>5</strong><small>平均匹配分 76</small></div>
+              <div class="stat-card"><span>专属题目</span><strong>42</strong><small>18 道来自公共题库</small></div>
+              <div class="stat-card"><span>待复习</span><strong>9</strong><small>本周建议完成</small></div>
+              <div class="stat-card"><span>投递记录</span><strong>6</strong><small>2 个面试中</small></div>
+            </div>
+
+            <div class="grid cols-2">
+              <div class="panel">
+                <div class="panel-header">
+                  <h2 class="panel-title">进行中的岗位</h2>
+                  <button class="btn ghost" data-view-jump="jobs">查看全部</button>
+                </div>
+                <div class="panel-body">
+                  <div class="table-wrap">
+                    <table>
+                      <thead>
+                        <tr><th>岗位</th><th>状态</th><th>匹配</th><th>下一步</th></tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td><strong>星河云 · 后端开发工程师</strong><small>Java 后端 · 上海</small></td>
+                          <td><span class="tag blue">准备中</span></td>
+                          <td><span class="tag green">78 分</span></td>
+                          <td><button class="small-action btn" data-view-jump="battle"><i data-lucide="target"></i>看作战卡</button></td>
+                        </tr>
+                        <tr>
+                          <td><strong>北辰智能 · AI 应用开发</strong><small>LLM 应用 · 杭州</small></td>
+                          <td><span class="tag amber">面试中</span></td>
+                          <td><span class="tag green">82 分</span></td>
+                          <td><button class="small-action btn" data-view-jump="questions"><i data-lucide="messages-square"></i>练专项题</button></td>
+                        </tr>
+                        <tr>
+                          <td><strong>青桐科技 · 前端开发</strong><small>React · 远程</small></td>
+                          <td><span class="tag blue">已投递</span></td>
+                          <td><span class="tag amber">71 分</span></td>
+                          <td><button class="small-action btn" data-view-jump="applications"><i data-lucide="send"></i>记录进展</button></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel">
+                <div class="panel-header">
+                  <h2 class="panel-title">本周复习队列</h2>
+                  <span class="tag amber">9 道待复习</span>
+                </div>
+                <div class="panel-body">
+                  <div class="timeline">
+                    <div class="timeline-item">
+                      <div class="timeline-dot"><i data-lucide="database"></i></div>
+                      <div><h4>MySQL 索引失效场景</h4><p>上次评分 68，需要补充执行计划和联合索引顺序。</p></div>
+                    </div>
+                    <div class="timeline-item">
+                      <div class="timeline-dot"><i data-lucide="server"></i></div>
+                      <div><h4>Redis 缓存击穿处理</h4><p>建议结合项目描述互斥锁和逻辑过期方案。</p></div>
+                    </div>
+                    <div class="timeline-item">
+                      <div class="timeline-dot"><i data-lucide="container"></i></div>
+                      <div><h4>Docker Compose 部署流程</h4><p>需要能讲清服务名通信、环境变量和数据卷。</p></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="view" id="resumes">
+            <div class="page-header">
+              <div>
+                <h1 class="page-title">简历</h1>
+                <p class="page-subtitle">管理简历版本，支持文本型 PDF、DOCX 和文本粘贴。</p>
+              </div>
+              <button class="btn primary"><i data-lucide="file-plus-2"></i>新增简历</button>
+            </div>
+
+            <div class="grid">
+              <div class="upload-grid">
+                <button class="upload-tile" data-action="upload-pdf">
+                  <i data-lucide="file-up"></i><strong>上传 PDF</strong><span>支持文本型 PDF，不支持扫描版。</span>
+                </button>
+                <button class="upload-tile" data-action="upload-docx">
+                  <i data-lucide="file-type-2"></i><strong>上传 DOCX</strong><span>自动解析文本并保存为简历版本。</span>
+                </button>
+                <button class="upload-tile" data-action="paste-resume">
+                  <i data-lucide="clipboard-pen"></i><strong>粘贴文本</strong><span>解析失败时的稳定兜底方式。</span>
+                </button>
+              </div>
+
+              <div class="split">
+                <div class="panel">
+                  <div class="panel-header">
+                    <h2 class="panel-title">简历版本</h2>
+                    <span class="tag green">默认：Java 后端实习版</span>
+                  </div>
+                  <div class="panel-body">
+                    <div class="table-wrap">
+                      <table>
+                        <thead>
+                          <tr><th>标题</th><th>目标岗位</th><th>类型</th><th>版本</th><th>状态</th></tr>
+                        </thead>
+                        <tbody>
+                          <tr>
+                            <td><strong>Java 后端实习版</strong><small>更新于 2026-06-24</small></td>
+                            <td>Java 后端</td><td>PDF</td><td>v3</td><td><span class="tag green">默认</span></td>
+                          </tr>
+                          <tr>
+                            <td><strong>AI 应用开发版</strong><small>突出 LangChain 与向量检索项目</small></td>
+                            <td>AI 应用开发</td><td>DOCX</td><td>v2</td><td><span class="tag blue">可用</span></td>
+                          </tr>
+                          <tr>
+                            <td><strong>前端 React 版</strong><small>补充组件化和状态管理经历</small></td>
+                            <td>前端开发</td><td>Text</td><td>v1</td><td><span class="tag amber">待优化</span></td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="panel">
+                  <div class="panel-header">
+                    <h2 class="panel-title">解析结果</h2>
+                    <button class="btn"><i data-lucide="save"></i>保存修改</button>
+                  </div>
+                  <div class="panel-body">
+                    <textarea class="textarea">项目经历：JobPilot AI 求职备战系统
+- 使用 Spring Boot 3、MyBatis-Plus、MySQL、Redis、Qdrant 实现岗位作战卡和题库检索。
+- 基于简历与 JD 生成结构化作战卡，使用 Redis 缓存相同分析结果。
+- 设计公共题库优先检索，题目不足时由 AI 补充并进入候选题库。</textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="view" id="jobs">
+            <div class="page-header">
+              <div>
+                <h1 class="page-title">岗位</h1>
+                <p class="page-subtitle">录入目标岗位，围绕 JD 生成作战卡和专属题目。</p>
+              </div>
+              <button class="btn primary"><i data-lucide="plus"></i>新建岗位</button>
+            </div>
+
+            <div class="filter-bar">
+              <select class="select" aria-label="行业领域">
+                <option>计算机 / 互联网</option>
+                <option>产品</option>
+                <option>运营</option>
+                <option>金融</option>
+              </select>
+              <select class="select" aria-label="岗位方向">
+                <option>Java 后端</option>
+                <option>前端开发</option>
+                <option>AI 应用开发</option>
+                <option>测试开发</option>
+              </select>
+              <select class="select" aria-label="状态">
+                <option>全部状态</option>
+                <option>准备中</option>
+                <option>已投递</option>
+                <option>面试中</option>
+              </select>
+              <input class="field" placeholder="搜索公司或岗位" />
+            </div>
+
+            <div class="split">
+              <div class="panel">
+                <div class="panel-header">
+                  <h2 class="panel-title">岗位列表</h2>
+                  <span class="tag blue">8 个岗位</span>
+                </div>
+                <div class="panel-body">
+                  <div class="table-wrap">
+                    <table>
+                      <thead>
+                        <tr><th>公司与岗位</th><th>方向</th><th>薪资</th><th>状态</th><th>作战卡</th></tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td><strong>星河云 · 后端开发工程师</strong><small>上海 · JD 来自 Boss 直聘</small></td>
+                          <td>Java 后端</td><td>12-18K</td><td><span class="tag blue">准备中</span></td><td><span class="tag green">78 分</span></td>
+                        </tr>
+                        <tr>
+                          <td><strong>北辰智能 · AI 应用开发</strong><small>杭州 · LLM 应用方向</small></td>
+                          <td>AI 应用开发</td><td>15-22K</td><td><span class="tag amber">面试中</span></td><td><span class="tag green">82 分</span></td>
+                        </tr>
+                        <tr>
+                          <td><strong>青桐科技 · 前端开发</strong><small>远程 · React + Ant Design</small></td>
+                          <td>前端开发</td><td>10-15K</td><td><span class="tag blue">已投递</span></td><td><span class="tag amber">71 分</span></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel">
+                <div class="panel-header">
+                  <h2 class="panel-title">岗位详情</h2>
+                  <span class="tag blue">活跃岗位</span>
+                </div>
+                <div class="panel-body grid">
+                  <div>
+                    <div class="tag-row">
+                      <span class="tag blue">计算机 / 互联网</span>
+                      <span class="tag">Java 后端</span>
+                      <span class="tag amber">准备中</span>
+                    </div>
+                  </div>
+                  <div class="insight">
+                    <h4><i data-lucide="file-search"></i>JD 摘要</h4>
+                    <p>要求熟悉 Java、Spring Boot、MySQL、Redis，具备 Docker 部署经验，能讲清项目中的接口设计、缓存策略和问题排查。</p>
+                  </div>
+                  <button class="btn primary" data-action="generate-card"><i data-lucide="sparkles"></i>生成岗位作战卡</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="view" id="battle">
+            <div class="page-header">
+              <div>
+                <h1 class="page-title">岗位作战卡</h1>
+                <p class="page-subtitle">基于简历和 JD 生成匹配分析、补强计划和面试重点。</p>
+              </div>
+              <button class="btn primary" data-view-jump="questions"><i data-lucide="messages-square"></i>生成专属题目</button>
+            </div>
+
+            <div class="split">
+              <div class="grid">
+                <div class="panel">
+                  <div class="panel-header">
+                    <h2 class="panel-title">星河云 · 后端开发工程师</h2>
+                    <span class="tag green">缓存命中</span>
+                  </div>
+                  <div class="panel-body score-wrap">
+                    <div class="score-ring">
+                      <div class="score-ring-inner">
+                        <div><strong>78</strong><br /><span>匹配分</span></div>
+                      </div>
+                    </div>
+                    <div>
+                      <h3 style="margin: 0 0 8px; font-size: 18px;">匹配良好，但 Redis 与部署经验需要补强</h3>
+                      <p style="margin: 0 0 12px; color: var(--text-secondary); line-height: 22px;">你的项目经历能覆盖 Spring Boot、MySQL 和基础接口设计，但 JD 对 Redis 缓存策略、Docker Compose 部署和问题排查表达要求更高。</p>
+                      <div class="tag-row">
+                        <span class="tag green">Spring Boot 已匹配</span>
+                        <span class="tag amber">Redis 需补强</span>
+                        <span class="tag amber">Docker 需补强</span>
+                        <span class="tag red">高并发经验不足</span>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="panel">
+                  <div class="panel-header">
+                    <h2 class="panel-title">能力拆解</h2>
+                    <span class="tag">第一版以技术标签为主</span>
+                  </div>
+                  <div class="panel-body capability-list">
+                    <div class="capability">
+                      <strong>Java / Spring Boot</strong>
+                      <div class="bar green"><span style="width: 88%;"></span></div>
+                      <span class="tag green">优势</span>
+                    </div>
+                    <div class="capability">
+                      <strong>MySQL 索引与事务</strong>
+                      <div class="bar green"><span style="width: 76%;"></span></div>
+                      <span class="tag green">可讲</span>
+                    </div>
+                    <div class="capability">
+                      <strong>Redis 缓存设计</strong>
+                      <div class="bar amber"><span style="width: 58%;"></span></div>
+                      <span class="tag amber">需补强</span>
+                    </div>
+                    <div class="capability">
+                      <strong>Docker Compose 部署</strong>
+                      <div class="bar amber"><span style="width: 52%;"></span></div>
+                      <span class="tag amber">需补强</span>
+                    </div>
+                    <div class="capability">
+                      <strong>高并发排查</strong>
+                      <div class="bar red"><span style="width: 36%;"></span></div>
+                      <span class="tag red">短板</span>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="grid cols-2">
+                  <div class="panel">
+                    <div class="panel-header"><h2 class="panel-title">已有优势</h2></div>
+                    <div class="panel-body insight-list">
+                      <div class="insight"><h4><i data-lucide="check-circle-2"></i>项目闭环完整</h4><p>简历里有从需求、开发、部署到优化的完整项目经历。</p></div>
+                      <div class="insight"><h4><i data-lucide="check-circle-2"></i>技术栈贴近岗位</h4><p>Spring Boot、MyBatis-Plus、MySQL 与岗位核心要求匹配。</p></div>
+                    </div>
+                  </div>
+                  <div class="panel">
+                    <div class="panel-header"><h2 class="panel-title">明显短板</h2></div>
+                    <div class="panel-body insight-list">
+                      <div class="insight"><h4><i data-lucide="triangle-alert"></i>缓存策略表达薄弱</h4><p>需要准备缓存击穿、穿透、雪崩和一致性问题。</p></div>
+                      <div class="insight"><h4><i data-lucide="triangle-alert"></i>部署经验不够具体</h4><p>需要能讲清 Docker Compose、Nginx 和服务通信。</p></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <aside class="grid">
+                <div class="panel">
+                  <div class="panel-header">
+                    <h2 class="panel-title">三天补强计划</h2>
+                  </div>
+                  <div class="panel-body timeline">
+                    <div class="timeline-item"><div class="timeline-dot">1</div><div><h4>Redis 高频问题</h4><p>缓存击穿、穿透、雪崩、一致性。</p></div></div>
+                    <div class="timeline-item"><div class="timeline-dot">2</div><div><h4>MySQL 追问</h4><p>索引失效、事务隔离、慢查询。</p></div></div>
+                    <div class="timeline-item"><div class="timeline-dot">3</div><div><h4>项目部署话术</h4><p>Docker Compose + Nginx + 环境变量。</p></div></div>
+                  </div>
+                </div>
+                <div class="panel">
+                  <div class="panel-header">
+                    <h2 class="panel-title">投递风险</h2>
+                    <span class="tag amber">中等</span>
+                  </div>
+                  <div class="panel-body insight-list">
+                    <div class="insight"><h4><i data-lucide="shield-alert"></i>风险提醒</h4><p>如果面试官深入追问高并发和线上排障，需要避免空泛描述，改用具体项目场景回答。</p></div>
+                    <button class="btn primary" data-view-jump="questions"><i data-lucide="messages-square"></i>生成专属题目</button>
+                  </div>
+                </div>
+              </aside>
+            </div>
+          </section>
+
+          <section class="view" id="questions">
+            <div class="page-header">
+              <div>
+                <h1 class="page-title">题库练习</h1>
+                <p class="page-subtitle">公共题库优先召回，题目不足时 AI 补充并进入候选题库。</p>
+              </div>
+              <button class="btn primary" data-action="generate-questions"><i data-lucide="sparkles"></i>生成题目</button>
+            </div>
+
+            <div class="panel" style="margin-bottom: 16px;">
+              <div class="panel-header">
+                <h2 class="panel-title">题目生成链路</h2>
+                <span class="tag blue">公共题库优先</span>
+              </div>
+              <div class="panel-body ai-stepper">
+                <div class="ai-step done"><strong>提取标签</strong><span>Java、Redis、MySQL、Docker</span></div>
+                <div class="ai-step done"><strong>公共题库召回</strong><span>18 道高质量题目</span></div>
+                <div class="ai-step active"><strong>AI 补充缺口</strong><span>生成 6 道项目追问题</span></div>
+                <div class="ai-step"><strong>候选题入库</strong><span>去重、评分、审核</span></div>
+              </div>
+            </div>
+
+            <div class="filter-bar">
+              <select class="select"><option>计算机 / 互联网</option><option>产品</option><option>运营</option></select>
+              <select class="select"><option>Java 后端</option><option>AI 应用开发</option><option>前端开发</option></select>
+              <select class="select"><option>全部题型</option><option>基础八股题</option><option>项目追问题</option><option>场景设计题</option></select>
+              <select class="select"><option>全部难度</option><option>简单</option><option>中等</option><option>困难</option></select>
+              <input class="field" placeholder="搜索标签或题目" />
+            </div>
+
+            <div class="practice-grid">
+              <div class="grid">
+                <article class="question-card">
+                  <div class="question-meta">
+                    <span class="tag green">公共题库</span>
+                    <span class="tag">中等</span>
+                    <span class="tag blue">Redis</span>
+                    <span class="tag amber">需复习</span>
+                  </div>
+                  <h3>如何解决缓存击穿问题？结合你的项目说明。</h3>
+                  <p style="margin:0;color:var(--text-secondary);line-height:22px;">要求说明产生原因、互斥锁、逻辑过期、热点 key 预热，以及在项目中的取舍。</p>
+                </article>
+                <article class="question-card">
+                  <div class="question-meta">
+                    <span class="tag blue">AI 补充</span>
+                    <span class="tag">中等</span>
+                    <span class="tag blue">Docker</span>
+                    <span class="tag">未练习</span>
+                  </div>
+                  <h3>你的项目如何用 Docker Compose 完成一键部署？</h3>
+                  <p style="margin:0;color:var(--text-secondary);line-height:22px;">需要讲清服务名通信、环境变量、数据卷、Nginx 反向代理和日志查看。</p>
+                </article>
+                <article class="question-card">
+                  <div class="question-meta">
+                    <span class="tag green">公共题库</span>
+                    <span class="tag">中等</span>
+                    <span class="tag blue">MySQL</span>
+                    <span class="tag green">已掌握</span>
+                  </div>
+                  <h3>联合索引什么时候会失效？如何用执行计划验证？</h3>
+                  <p style="margin:0;color:var(--text-secondary);line-height:22px;">建议结合最左前缀、范围查询、函数计算和隐式类型转换回答。</p>
+                </article>
+              </div>
+
+              <aside class="panel">
+                <div class="panel-header">
+                  <h2 class="panel-title">单题练习</h2>
+                  <span class="tag amber">Redis 专项</span>
+                </div>
+                <div class="panel-body grid">
+                  <textarea class="textarea" id="answerBox">我会先判断是不是热点 key 过期导致大量请求打到数据库，然后用互斥锁限制并发重建缓存，也可以用逻辑过期让旧数据先返回...</textarea>
+                  <button class="btn primary" data-action="evaluate-answer"><i data-lucide="gauge"></i>提交 AI 评分</button>
+                  <div class="evaluation" id="evaluationPanel">
+                    <div class="grade"><strong>82</strong><span>分</span></div>
+                    <div>
+                      <h3 style="margin:0 0 8px;">回答方向正确，项目细节还可以更具体</h3>
+                      <div class="tag-row" style="margin-bottom:10px;">
+                        <span class="tag green">优点：方案完整</span>
+                        <span class="tag amber">问题：缺少取舍</span>
+                      </div>
+                      <p style="margin:0;color:var(--text-secondary);line-height:22px;">优化时建议补充：为什么不用简单加锁、锁超时如何设置、逻辑过期是否接受短暂旧数据。</p>
+                    </div>
+                  </div>
+                  <button class="btn" data-action="save-knowledge"><i data-lucide="book-plus"></i>保存到知识库</button>
+                </div>
+              </aside>
+            </div>
+          </section>
+
+          <section class="view" id="knowledge">
+            <div class="page-header">
+              <div>
+                <h1 class="page-title">个人知识库</h1>
+                <p class="page-subtitle">沉淀自己的答案、项目话术、错题总结和投递复盘。</p>
+              </div>
+              <button class="btn primary"><i data-lucide="book-plus"></i>新建条目</button>
+            </div>
+
+            <div class="knowledge-layout">
+              <aside class="panel">
+                <div class="panel-header"><h2 class="panel-title">分类</h2></div>
+                <div class="panel-body category-list">
+                  <button class="category-button active"><span>全部</span><strong>28</strong></button>
+                  <button class="category-button"><span>项目话术</span><strong>9</strong></button>
+                  <button class="category-button"><span>技术笔记</span><strong>7</strong></button>
+                  <button class="category-button"><span>错题总结</span><strong>6</strong></button>
+                  <button class="category-button"><span>面试复盘</span><strong>4</strong></button>
+                  <button class="category-button"><span>HR 回答</span><strong>2</strong></button>
+                </div>
+              </aside>
+
+              <div class="grid">
+                <div class="filter-bar">
+                  <input class="field" style="min-width:260px;" placeholder="搜索知识条目" />
+                  <select class="select"><option>全部掌握程度</option><option>需复习</option><option>已掌握</option><option>高频重点</option></select>
+                  <select class="select"><option>全部来源</option><option>练习评分</option><option>投递复盘</option><option>手动创建</option></select>
+                </div>
+                <article class="question-card">
+                  <div class="question-meta"><span class="tag blue">项目话术</span><span class="tag amber">高频重点</span><span class="tag">Redis</span></div>
+                  <h3>缓存击穿的项目回答版本</h3>
+                  <p style="margin:0;color:var(--text-secondary);line-height:22px;">结合 JobPilot AI 的题库缓存场景，说明热点 key、互斥锁、逻辑过期和降级策略。</p>
+                </article>
+                <article class="question-card">
+                  <div class="question-meta"><span class="tag blue">技术笔记</span><span class="tag green">已掌握</span><span class="tag">Docker</span></div>
+                  <h3>Docker Compose 一键部署讲法</h3>
+                  <p style="margin:0;color:var(--text-secondary);line-height:22px;">服务名通信、环境变量、数据卷、Nginx 反向代理、容器日志查看。</p>
+                </article>
+                <article class="question-card">
+                  <div class="question-meta"><span class="tag blue">面试复盘</span><span class="tag amber">需复习</span><span class="tag">MySQL</span></div>
+                  <h3>星河云一面复盘：索引追问回答不够完整</h3>
+                  <p style="margin:0;color:var(--text-secondary);line-height:22px;">补充执行计划、覆盖索引、回表和慢查询定位。</p>
+                </article>
+              </div>
+
+              <aside class="panel">
+                <div class="panel-header">
+                  <h2 class="panel-title">条目详情</h2>
+                  <button class="btn"><i data-lucide="edit-3"></i>编辑</button>
+                </div>
+                <div class="panel-body grid">
+                  <div class="tag-row">
+                    <span class="tag blue">项目话术</span>
+                    <span class="tag amber">高频重点</span>
+                    <span class="tag">Redis</span>
+                  </div>
+                  <div class="insight">
+                    <h4><i data-lucide="book-open-check"></i>面试回答版本</h4>
+                    <p>在我的项目中，题库和作战卡结果会被缓存。对于热点 key，我会使用互斥锁控制缓存重建，并结合逻辑过期避免大量请求直接打到数据库。</p>
+                  </div>
+                  <div class="insight">
+                    <h4><i data-lucide="message-circle-question"></i>可能追问</h4>
+                    <p>锁超时时间怎么设置？如果缓存重建失败怎么办？逻辑过期返回旧数据是否可接受？</p>
+                  </div>
+                </div>
+              </aside>
+            </div>
+          </section>
+
+          <section class="view" id="applications">
+            <div class="page-header">
+              <div>
+                <h1 class="page-title">投递复盘</h1>
+                <p class="page-subtitle">记录投递结果，并把失败原因转化为下一轮准备计划。</p>
+              </div>
+              <button class="btn primary"><i data-lucide="plus"></i>新增投递</button>
+            </div>
+
+            <div class="grid cols-4" style="margin-bottom:16px;">
+              <div class="stat-card"><span>准备中</span><strong>3</strong><small>待生成题目</small></div>
+              <div class="stat-card"><span>已投递</span><strong>4</strong><small>等待反馈</small></div>
+              <div class="stat-card"><span>面试中</span><strong>2</strong><small>需要复习</small></div>
+              <div class="stat-card"><span>已拒绝</span><strong>1</strong><small>已生成复盘</small></div>
+            </div>
+
+            <div class="split">
+              <div class="panel">
+                <div class="panel-header">
+                  <h2 class="panel-title">投递记录</h2>
+                  <span class="tag blue">关联作战卡</span>
+                </div>
+                <div class="panel-body">
+                  <div class="table-wrap">
+                    <table>
+                      <thead>
+                        <tr><th>公司岗位</th><th>状态</th><th>投递日期</th><th>结果</th><th>操作</th></tr>
+                      </thead>
+                      <tbody>
+                        <tr>
+                          <td><strong>星河云 · 后端开发工程师</strong><small>作战卡 78 分 · Java 后端实习版</small></td>
+                          <td><span class="tag blue">准备中</span></td><td>2026-06-24</td><td>暂无</td><td><button class="btn">更新</button></td>
+                        </tr>
+                        <tr>
+                          <td><strong>北辰智能 · AI 应用开发</strong><small>作战卡 82 分 · AI 应用开发版</small></td>
+                          <td><span class="tag amber">面试中</span></td><td>2026-06-21</td><td>二面待定</td><td><button class="btn">复盘</button></td>
+                        </tr>
+                        <tr>
+                          <td><strong>云帆科技 · Java 实习生</strong><small>作战卡 69 分 · Java 后端实习版</small></td>
+                          <td><span class="tag red">已拒绝</span></td><td>2026-06-18</td><td>项目深度不足</td><td><button class="btn primary" data-action="review-application"><i data-lucide="sparkles"></i>生成复盘</button></td>
+                        </tr>
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <aside class="panel">
+                <div class="panel-header">
+                  <h2 class="panel-title">AI 复盘建议</h2>
+                  <span class="tag green">已生成</span>
+                </div>
+                <div class="panel-body insight-list">
+                  <div class="insight"><h4><i data-lucide="search-check"></i>失败原因</h4><p>项目讲解停留在功能层，缺少架构取舍、问题排查和性能优化细节。</p></div>
+                  <div class="insight"><h4><i data-lucide="list-checks"></i>下一步</h4><p>用三道项目追问题补齐：缓存一致性、慢查询定位、Docker 部署排障。</p></div>
+                  <button class="btn" data-action="save-knowledge"><i data-lucide="book-plus"></i>保存到知识库</button>
+                </div>
+              </aside>
+            </div>
+          </section>
+
+          <section class="view" id="settings">
+            <div class="page-header">
+              <div>
+                <h1 class="page-title">设置</h1>
+                <p class="page-subtitle">管理账号、默认简历、默认行业和 AI 生成偏好。</p>
+              </div>
+              <button class="btn primary"><i data-lucide="save"></i>保存设置</button>
+            </div>
+
+            <div class="grid cols-2">
+              <div class="panel">
+                <div class="panel-header"><h2 class="panel-title">账号信息</h2></div>
+                <div class="panel-body grid">
+                  <label>用户名<br /><input class="field" style="width:100%;" value="jobpilot_user" /></label>
+                  <label>邮箱<br /><input class="field" style="width:100%;" value="demo@jobpilot.ai" /></label>
+                  <button class="btn danger"><i data-lucide="log-out"></i>退出登录</button>
+                </div>
+              </div>
+
+              <div class="panel">
+                <div class="panel-header"><h2 class="panel-title">默认偏好</h2></div>
+                <div class="panel-body grid">
+                  <label>默认简历<br /><select class="select" style="width:100%;"><option>Java 后端实习版</option><option>AI 应用开发版</option></select></label>
+                  <label>默认行业领域<br /><select class="select" style="width:100%;"><option>计算机 / 互联网</option><option>产品</option><option>运营</option></select></label>
+                  <label>默认岗位方向<br /><select class="select" style="width:100%;"><option>Java 后端</option><option>前端开发</option><option>AI 应用开发</option></select></label>
+                </div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </main>
+    </div>
+
+    <div class="toast" id="toast"><i data-lucide="circle-check"></i><span id="toastText">操作已完成</span></div>
+
+    <script>
+      const viewButtons = document.querySelectorAll("[data-view]");
+      const views = document.querySelectorAll(".view");
+      const sidebar = document.getElementById("sidebar");
+      const toast = document.getElementById("toast");
+      const toastText = document.getElementById("toastText");
+
+      function showToast(message) {
+        toastText.textContent = message;
+        toast.classList.add("show");
+        window.clearTimeout(showToast.timer);
+        showToast.timer = window.setTimeout(() => toast.classList.remove("show"), 2600);
+      }
+
+      function switchView(id) {
+        views.forEach((view) => view.classList.toggle("active", view.id === id));
+        viewButtons.forEach((button) => button.classList.toggle("active", button.dataset.view === id));
+        sidebar.classList.remove("open");
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+
+      viewButtons.forEach((button) => {
+        button.addEventListener("click", () => switchView(button.dataset.view));
+      });
+
+      document.querySelectorAll("[data-view-jump]").forEach((button) => {
+        button.addEventListener("click", () => switchView(button.dataset.viewJump));
+      });
+
+      document.getElementById("menuButton").addEventListener("click", () => {
+        sidebar.classList.toggle("open");
+      });
+
+      document.querySelectorAll("[data-action]").forEach((button) => {
+        button.addEventListener("click", () => {
+          const action = button.dataset.action;
+          if (action === "generate-card") {
+            showToast("正在生成岗位作战卡：已检查缓存，准备分析 JD。");
+            switchView("battle");
+          } else if (action === "generate-questions") {
+            showToast("已优先检索公共题库，不足部分将进入 AI 补题。");
+          } else if (action === "evaluate-answer") {
+            showToast("AI 评分完成：当前回答 82 分，可保存到知识库。");
+          } else if (action === "save-knowledge") {
+            showToast("已保存到个人知识库。");
+          } else if (action === "review-application") {
+            showToast("正在结合作战卡和投递结果生成复盘建议。");
+          } else if (action === "upload-pdf") {
+            showToast("PDF 上传入口：当前预览仅展示交互状态。");
+          } else if (action === "upload-docx") {
+            showToast("DOCX 上传入口：当前预览仅展示交互状态。");
+          } else if (action === "paste-resume") {
+            showToast("已进入文本简历录入流程。");
+          }
+        });
+      });
+
+      if (window.lucide) {
+        window.lucide.createIcons();
+      }
+    </script>
+  </body>
+</html>
