@@ -41,6 +41,8 @@ cd backend && mvn spring-boot:run
 cd frontend && npm install && npm run dev
 ```
 
+If your server uses Docker Compose v1, replace `docker compose` with `docker-compose`.
+
 The current machine must have Java 17 and Docker installed before the backend and Compose checks can pass.
 
 More detail:

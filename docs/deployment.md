@@ -21,11 +21,24 @@ Build and start:
 docker compose --env-file .env up -d --build
 ```
 
+For Docker Compose v1, run:
+
+```bash
+docker-compose up -d --build
+```
+
 Check logs:
 
 ```bash
 docker compose logs -f backend
 docker compose logs -f frontend
+```
+
+For Docker Compose v1:
+
+```bash
+docker-compose logs -f backend
+docker-compose logs -f frontend
 ```
 
 The frontend is exposed on port `80`. It serves the React app and proxies `/api` to the backend service by Docker service name.

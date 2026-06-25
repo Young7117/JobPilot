@@ -13,6 +13,12 @@
 docker compose -f docker-compose.dev.yml up -d
 ```
 
+For Docker Compose v1:
+
+```bash
+docker-compose -f docker-compose.dev.yml up -d
+```
+
 Services:
 
 - MySQL: `localhost:3306`
@@ -44,4 +50,10 @@ Stop Compose and remove volumes:
 
 ```bash
 docker compose -f docker-compose.dev.yml down -v
+```
+
+For Docker Compose v1:
+
+```bash
+docker-compose -f docker-compose.dev.yml down -v
 ```

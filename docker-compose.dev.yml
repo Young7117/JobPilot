@@ -1,7 +1,10 @@
+version: "3.8"
+
 services:
   mysql:
     image: mysql:8.4
     container_name: jobpilot-mysql-dev
+    restart: unless-stopped
     environment:
       MYSQL_DATABASE: ${MYSQL_DATABASE:-jobpilot_ai}
       MYSQL_USER: ${MYSQL_USER:-jobpilot}
@@ -24,6 +27,7 @@ services:
   redis:
     image: redis:7.4-alpine
     container_name: jobpilot-redis-dev
+    restart: unless-stopped
     ports:
       - "${REDIS_PORT:-6379}:6379"
     volumes:
@@ -38,6 +42,7 @@ services:
   qdrant:
     image: qdrant/qdrant:v1.12.4
     container_name: jobpilot-qdrant-dev
+    restart: unless-stopped
     ports:
       - "${QDRANT_PORT:-6333}:6333"
       - "${QDRANT_GRPC_PORT:-6334}:6334"
